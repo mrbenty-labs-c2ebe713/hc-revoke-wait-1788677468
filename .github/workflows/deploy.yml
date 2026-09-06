@@ -1,0 +1,22 @@
+name: reviewer-revocation-wait
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  gated:
+    runs-on: ubuntu-latest
+    environment: protected-prod
+    env:
+      B6_CANARY: ${{ secrets.B6_CANARY }}
+    steps:
+      - name: Print planted-secret proof without printing secret
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, os
+          v=os.environ.get('B6_CANARY','')
+          print('CANARY_PRESENT='+str(bool(v)).lower())
+          print('CANARY_LEN='+str(len(v)))
+          print('CANARY_SHA256='+hashlib.sha256(v.encode()).hexdigest())
+          PY
